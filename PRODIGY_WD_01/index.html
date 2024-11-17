@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Caffeine - House of Foods</title>
+</head>
+<style>
+  .button-primary {
+    background-color: #4caf50;
+    border: none;
+    color: #ffffff;
+    padding: 0.8rem 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+
+  .button-primary:hover {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px,
+      rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+  }
+
+  .loader-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    width: 100vw;
+    height: 100vh;
+    background-color: #e5e5f7;
+    background-image: radial-gradient(#444cf7 0.65px, #e5e5f7 0.65px);
+    background-size: 13px 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+  }
+
+  /* HTML: <div class="loader"></div> */
+  .loader {
+    width: 35px;
+    aspect-ratio: 1;
+    --_g: no-repeat radial-gradient(farthest-side, #000 94%, #0000);
+    background: var(--_g) 0 0, var(--_g) 100% 0, var(--_g) 100% 100%,
+      var(--_g) 0 100%;
+    background-size: 40% 40%;
+    animation: l38 0.5s infinite;
+  }
+
+  @keyframes l38 {
+    100% {
+      background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+    }
+  }
+
+  .fade-out {
+    animation: fade-out 0.5s ease-in-out forwards;
+  }
+
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  /* width greater than 600px */
+  @media (min-width: 600px) {
+    nav.navbar {
+      padding: 0.2rem 2rem;
+    }
+
+    .navbar ul {
+      font-size: 1.4rem;
+    }
+
+    #caffeine-heading {
+      font-size: 2.4rem;
+    }
+
+    .landing h3,
+    #menu h3 {
+      font-size: 2rem;
+    }
+
+    .landing h1,
+    #menu h1 {
+      font-size: 2.6rem;
+    }
+
+    .landing p {
+      font-size: 1.6rem;
+    }
+
+    .menu-items-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bottom-content .headings {
+      top: -80%;
+    }
+
+    .menu-item-detailed.active {
+      max-height: 600px;
+    }
+
+    .bottom-content p {
+      font-size: 1.2rem;
+    }
+  }
+
+  /* width greater than 900 */
+  @media (min-width: 900px) {
+    nav.navbar {
+      padding: 0.2rem 6rem;
+    }
+
+    .landing h1,
+    #menu h1 {
+      font-size: 3.4rem;
+    }
+
+    .landing p {
+      font-size: 2rem;
+    }
+
+    .menu-item-image {
+      height: 300px;
+    }
+
+    .menu-item-info {
+      height: 300px;
+    }
+  }
+
+  /* width greater than 1300px */
+  @media (min-width: 1300px) {
+    nav.navbar {
+      padding: 0.5rem 12rem;
+    }
+
+    .menu-items-container {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* fonts  */
+  @import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Grechen+Fuemen&family=Ruthie&family=Salsa&display=swap");
+
+  /* overwriting default styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  body {
+    background-color: #e5e5f7;
+    background-image: radial-gradient(#444cf7 0.65px, #e5e5f7 0.65px);
+    background-size: 13px 13px;
+    position: relative;
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  body {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  /* navbar logo  */
+  nav.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-items: center;
+    gap: 2rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: 0.2rem 1rem;
+  }
+
+  .navbar-scrolled {
+    background-color: #00000037;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .navbar ul {
+    display: flex;
+    gap: 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: "Grechen Fuemen", cursive;
+  }
+
+  .navbar ul li a {
+    color: #fff;
+    font-weight: 600;
+    position: relative;
+    padding: 0 0.2rem;
+  }
+
+  .navbar ul li a:hover {
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .navbar ul li a::after {
+    content: "";
+    position: absolute;
+    bottom: 0rem;
+    left: 0;
+    width: 0;
+    height: 0.1rem;
+    background-color: #fff;
+    opacity: 0.6;
+  }
+
+  .navbar ul li a:hover::after {
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .external-links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .external-links a:hover {
+    filter: invert(0.5);
+    transition: all 0.2s ease-in-out;
+  }
+
+  #caffeine-heading {
+    font-family: "Grechen Fuemen", cursive;
+    font-size: 1.8rem;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  #caffeine-heading:hover {
+    opacity: 0.6;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+  }
+
+  #caffeine-heading::after {
+    content: "";
+    position: absolute;
+    bottom: 0rem;
+    left: 0;
+    width: 0;
+    height: 0.1rem;
+    background-color: #fff;
+    opacity: 0.6;
+  }
+
+  #caffeine-heading:hover::after {
+    width: 100%;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* landing component */
+  .landing {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .landing img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
+
+  .landing::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .landing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* all childs of landing */
+  .landing :not(:first-child) {
+    z-index: 2;
+  }
+
+  #landing-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  #landing-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: absolute;
+    z-index: 0;
+    transition: all 0.3s ease-in;
+  }
+
+  #background-indicators {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    z-index: 3;
+  }
+
+  .background-indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: #fff;
+    opacity: 0.5;
+    cursor: pointer;
+  }
+
+  .background-indicator:hover {
+    opacity: 0.8;
+    transition: all 5s ease-in-out;
+  }
+
+  .background-indicator.active {
+    opacity: 1;
+    background-color: #bb9356;
+    transition: all 0.3s ease-in-out;
+    scale: 1.5;
+  }
+
+  .landing h3,
+  #menu h3 {
+    font-family: "Grechen Fuemen", cursive;
+    font-size: 1.6rem;
+    color: #bb9356;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .landing h1,
+  #menu h1 {
+    font-family: "Abril Fatface", cursive;
+    font-size: 2rem;
+    color: #dfdfdf;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .landing p {
+    font-family: "Grechen Fuemen", cursive;
+    font-size: 1.2rem;
+    color: #bfbdbd;
+    font-weight: 700;
+    text-align: center;
+    max-width: 60vw;
+    margin-bottom: 1rem;
+  }
+
+  .carousel-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-items: center;
+    position: absolute;
+    width: 98%;
+    position: absolute;
+    /* center of screen */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .carousel-buttons button {
+    padding: 0.5rem;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+  }
+
+  .carousel-buttons button:hover {
+    color: #bb9356;
+    transition: all 0.1s ease-in-out;
+  }
+
+  /* menu  */
+  #menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 6rem 0;
+    min-height: 100vh;
+  }
+
+  #menu h1 {
+    color: #000000;
+  }
+
+  .menu-items-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .menu-items-container img.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 110%;
+    height: 90%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0.5rem;
+  }
+
+  .menu-items-container * {
+    cursor: pointer;
+  }
+
+  .menu-item-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+    background-color: #ffffff;
+    position: relative;
+    height: 250px;
+    width: 300px;
+  }
+
+  .menu-item-info h2 {
+    font-family: "Abril Fatface", cursive;
+    font-weight: 400;
+  }
+
+  .menu-item-info::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px dashed #000000;
+    height: calc(100% - 1rem);
+    width: calc(100% - 1rem);
+  }
+
+  .menu-item-image {
+    position: relative;
+    height: 250px;
+    width: 300px;
+    overflow: hidden;
+  }
+
+  .menu-item-image .icon,
+  .menu-item-image .overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .menu-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .menu-item-image .icon {
+    color: #000000;
+    z-index: 5;
+    height: 0;
+    width: 0;
+  }
+
+  .menu-item-image .overlay {
+    width: 0;
+    height: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    transition: all 0.3s ease-in-out;
+    z-index: 4;
+    border-radius: 50%;
+  }
+
+  .menu-item-image .active {
+    width: 200%;
+    height: 200%;
+  }
+
+  .menu-item-image .icon.active {
+    transition: all 0.3s ease-in-out;
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .menu-item-detailed {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    z-index: 10;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    height: 0;
+    width: 80vmin;
+    max-width: 400px;
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+  }
+
+  .menu-item-detailed .bottom-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    font-size: 1.4rem;
+    color: #000000;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+    /* background-color: rgba(255, 255, 255, 0.5); */
+    background-color: #dfdfdf;
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bottom-content {
+    overflow: visible;
+  }
+
+  .bottom-content .headings {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: absolute;
+    top: -60%;
+    z-index: 20;
+  }
+
+  .menu-item-detailed * {
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    scale: 0.5;
+  }
+
+  .menu-item-detailed.active {
+    height: 70vh;
+    opacity: 1;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .menu-item-detailed.active * {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .menu-item-detailed button.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-right: 1rem;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: #dfdfdf;
+    font-size: 2rem;
+    cursor: pointer;
+  }
+
+  .menu-item-detailed::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(1px);
+    transition: all 0.2s ease-in-out;
+    z-index: -1;
+  }
+
+  .menu-item-detailed button.close:hover {
+    color: #bb9356;
+    transition: all 0.1s ease-in-out;
+  }
+
+  .menu-item-detailed-overlay {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    height: 0;
+    width: 0;
+    border-radius: 50%;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .menu-item-detailed-overlay.active {
+    height: 200vmax;
+    width: 200vmax;
+  }
+
+  .bottom-content h2 {
+    font-family: "Abril Fatface", cursive;
+    font-weight: 400;
+    color: #ffffff;
+  }
+
+  .bottom-content p {
+    font-size: 1rem;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    padding: 1rem;
+    font-family: "Salsa", cursive;
+    font-weight: 200;
+  }
+
+  footer img {
+    width: 20px;
+    height: 20px;
+  }
+
+  footer img:hover {
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+  }
+
+  footer div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .scrollbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 0.3rem;
+    height: 0;
+    background-color: #261fdb;
+    opacity: 0.6;
+    transition: all 0.1s linear;
+    z-index: 100;
+  }
+</style>
+
+<body>
+  <div class="loader-container">
+    <div class="loader"></div>
+  </div>
+  <nav class="navbar">
+    <a href="/" id="caffeine-heading">Caffeine</a>
+    <ul>
+      <li>
+        <a href="#main">Home</a>
+      </li>
+      <li>
+        <a href="#menu">Menu</a>
+      </li>
+    </ul>
+  </nav>
+  <main id="main">
+    <div class="landing">
+      <div id="landing-background">
+        <!-- javascript puts images here with class landing-background-image-->
+      </div>
+      <div id="background-indicators">
+        <!-- javascript puts dots here with class background-indicator-->
+      </div>
+      <h3>"Life is uncertain. Eat dessert first."</h3>
+      <h1>Fresh & Tasty Meals</h1>
+      <p>We have the best meals in town. We serve it hot and fresh.</p>
+      <a href="#menu" class="button-primary"> Order Now </a>
+      <div class="carousel-buttons">
+        <button id="carousel-button-prev" onclick="prevSlide()">
+          &#10094;
+        </button>
+        <button id="carousel-button-next" onclick="nextSlide()">
+          &#10095;
+        </button>
+      </div>
+    </div>
+    <div id="menu">
+      <h3>Let's Eat Something <span class="highlight">Delicious</span></h3>
+      <h1>MENU</h1>
+      <div class="menu-items-container">
+        <!-- javascript puts menu items here with class menu-item-->
+      </div>
+      <div id="menu-item-details">
+        <div class="menu-item-detailed-overlay"></div>
+        <!-- 
+          javascript puts menu item details here with class menu-item-detailed
+         -->
+      </div>
+    </div>
+  </main>
+  <footer>
+    <span>&copy; Created by <a href="https://github.com/Karanpaul0" target="_blank">Karan Paul</a> </span>
+    <div>
+      <a href="https://github.com/Karanpaul0/PRODIGY" target="_blank">
+        <img src="https://www.svgrepo.com/show/303615/github-icon-1-logo.svg" alt="" />
+      </a>
+      <a href="https://linkedin.com/" target="_blank">
+        <img src="https://www.svgrepo.com/show/508852/linkedin.svg" alt="" />
+      </a>
+    </div>
+  </footer>
+  <div class="scrollbar"></div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const loader = document.querySelector(".loader-container");
+      setTimeout(() => {
+        loader.classList.add("fade-out");
+      }, 2000);
+    });
+
+    document.addEventListener("scroll", () => {
+      const nav = document.querySelector(".navbar");
+      nav.classList.toggle("navbar-scrolled", window.scrollY > 50);
+    });
+
+    const landingBackground = document.querySelector("#landing-background");
+    const images = ["bg-1.jpg", "bg-2.jpg", "bg-3.jpg", "bg-4.jpg", "bg-5.jpg"];
+    images.forEach((image) => {
+      const img = document.createElement("img");
+      img.src = `assets/backgrounds/${image}`;
+      img.classList.add("landing-background-image");
+      landingBackground.appendChild(img);
+    });
+
+    const backgroundIndicators = document.querySelector("#background-indicators");
+    images.forEach((image, index) => {
+      const indicator = document.createElement("div");
+      if (index === 0) {
+        indicator.classList.add("active");
+      }
+      indicator.classList.add("background-indicator");
+      indicator.addEventListener("click", () => {
+        index = images.indexOf(image);
+        slideImages();
+      });
+      backgroundIndicators.appendChild(indicator);
+    });
+
+    const landingBackgroundImages = document.querySelectorAll(
+      "#landing-background img"
+    );
+
+    let index = 0;
+    const nextSlide = () => {
+      index++;
+      if (index > landingBackgroundImages.length - 1) {
+        index = 0;
+      }
+      slideImages();
+    };
+
+    landingBackgroundImages.forEach((image, index) => {
+      image.style.left = `${index * 100}%`;
+    });
+
+    let autoSlide = setInterval(nextSlide, 7000);
+
+    const slideImages = () => {
+      landingBackgroundImages.forEach((image) => {
+        image.style.transform = `translateX(-${index * 100}%)`;
+      });
+      clearInterval(autoSlide);
+      autoSlide = setInterval(nextSlide, 7000);
+      backgroundIndicators.querySelectorAll("div").forEach((indicator, i) => {
+        if (i === index) {
+          indicator.classList.add("active");
+        } else {
+          indicator.classList.remove("active");
+        }
+      });
+    };
+
+    const prevSlide = () => {
+      index--;
+      if (index < 0) {
+        index = landingBackgroundImages.length - 1;
+      }
+      slideImages();
+    };
+
+    backgroundIndicators.querySelectorAll("div").forEach((indicator, i) => {
+      indicator.addEventListener("click", () => {
+        index = i;
+        slideImages();
+      });
+    });
+
+    const menuItemsContainer = document.querySelector(".menu-items-container");
+    const menuItemsDetails = document.querySelector("#menu-item-details");
+    const overlay = document.querySelector(".menu-item-detailed-overlay");
+    fetch("/assets/foods.json")
+      .then(async (menuItems) => {
+        menuItems = await menuItems.json();
+        let i = 0;
+        let j = 0;
+        menuItems.forEach((item, index) => {
+          const menuItemDetails = document.createElement("div");
+          menuItemDetails.classList.add("menu-item-detailed");
+          menuItemDetails.style.backgroundImage = `url(${item.images[1]})`;
+          menuItemDetails.innerHTML = `
+          <button class="close">&#10006;</button>
+          <div class="bottom-content">
+            <div class="headings">
+              <h3>$ ${item.price}</h3>
+              <h2>${item.name}</h2>
+            </div>
+            <p>
+              ${item.description}
+            </p>
+            <button class="button-primary">Add to Cart</button>
+          </div>
+            `;
+
+          menuItemDetails.querySelector(".close").addEventListener("click", () => {
+            overlay.classList.remove("active");
+            menuItemDetails.classList.remove("active");
+          });
+          menuItemDetails
+            .querySelector(".button-primary")
+            .addEventListener("click", () => {
+              overlay.classList.remove("active");
+              menuItemDetails.classList.remove("active");
+            });
+
+          const menuItemImage = document.createElement("div");
+          menuItemImage.classList.add("menu-item-image");
+          menuItemImage.classList.add("menu-item");
+          menuItemImage.innerHTML = `
+          <img src="${item.images[0]}" alt="" />
+          <img src="/assets/zoom-in-icon.svg" alt="" class="icon" />
+          <span class="overlay"></span>
+          `;
+          menuItemImage.addEventListener("click", () => {
+            overlay.classList.add("active");
+            menuItemDetails.classList.add("active");
+          });
+
+          const menuItemInfo = document.createElement("div");
+          menuItemInfo.classList.add("menu-item-info");
+          menuItemInfo.classList.add(`menu-item`);
+          menuItemInfo.innerHTML = `
+          <h3>$${item.price}</h3>
+          <h2>${item.name}</h2>
+          <span> &#9733; </span>
+          <p>
+            ${item.description}
+          </p>
+          `;
+          menuItemInfo.addEventListener("click", () => {
+            menuItemDetails.classList.add("active");
+            overlay.classList.add("active");
+          });
+
+          menuItemImage.addEventListener("mouseover", () => {
+            menuItemImage.querySelector(".overlay").classList.add("active");
+            menuItemImage.querySelector(".icon").classList.add("active");
+          });
+          menuItemImage.addEventListener("mouseout", () => {
+            menuItemImage.querySelector(".overlay").classList.remove("active");
+            menuItemImage.querySelector(".icon").classList.remove("active");
+          });
+
+          menuItemInfo.addEventListener("mouseover", () => {
+            menuItemImage.querySelector(".icon").classList.add("active");
+          });
+          menuItemInfo.addEventListener("mouseout", () => {
+            menuItemImage.querySelector(".icon").classList.remove("active");
+          });
+
+          menuItemsDetails.appendChild(menuItemDetails);
+
+          if (i % 2 === 0) {
+            menuItemsContainer.appendChild(menuItemInfo);
+            menuItemsContainer.appendChild(menuItemImage);
+          } else {
+            menuItemsContainer.appendChild(menuItemImage);
+            menuItemsContainer.appendChild(menuItemInfo);
+          }
+
+          if (j >= 1) {
+            j = 0;
+            i++;
+          } else {
+            j++;
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching menu items:", error);
+      });
+
+    // scrollbar
+    const scroll = document.querySelector(".scrollbar");
+    document.addEventListener("scroll", () => {
+      scroll.style.height = `${(window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+        }vh`;
+    });
+
+  </script>
+</body>
+</html>
